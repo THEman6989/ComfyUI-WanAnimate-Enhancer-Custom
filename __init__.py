@@ -7,6 +7,7 @@ try:
     from .wan_animate_to_video_enhanced import (
         WanAnimateToVideoEnhanced,
         WanAnimateModelEnhancer,
+        WanAnimateFFNChunking,
     )
 except ImportError:
     # Pytest imports a repository-root __init__.py without package context.
@@ -16,33 +17,41 @@ except ImportError:
     from wan_animate_to_video_enhanced import (
         WanAnimateToVideoEnhanced,
         WanAnimateModelEnhancer,
+        WanAnimateFFNChunking,
     )
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 NODE_CLASS_MAPPINGS = {
     "WanAnimateToVideoEnhanced": WanAnimateToVideoEnhanced,
     "WanAnimateModelEnhancer": WanAnimateModelEnhancer,
+    "WanAnimateFFNChunking": WanAnimateFFNChunking,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "WanAnimateToVideoEnhanced": "Wan Animate To Video Enhanced (Custom)",
     "WanAnimateModelEnhancer": "Wan Animate Model Enhancer (Custom)",
+    "WanAnimateFFNChunking": "WAN FFN Chunking (Custom)",
 }
 
 NODE_METADATA = {
     "WanAnimateToVideoEnhanced": {
-        "version": "1.1.0",
+        "version": "1.2.0",
         "category": "Wan2.2AnimateEnhancer",
         "description": "Enhanced WanAnimateToVideo with motion/expression/pose/background control",
     },
     "WanAnimateModelEnhancer": {
-        "version": "1.1.0",
+        "version": "1.2.0",
         "category": "Wan2.2AnimateEnhancer",
         "description": "Model enhancer for motion strength control",
+    },
+    "WanAnimateFFNChunking": {
+        "version": "1.2.0",
+        "category": "Wan2.2AnimateEnhancer",
+        "description": "Branch-local selectable WAN FFN chunking for lower peak VRAM",
     },
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'NODE_METADATA']
 
-print(f"Wan Animate Enhancer Custom v{__version__} loaded - 2 nodes registered")
+print(f"Wan Animate Enhancer Custom v{__version__} loaded - 3 nodes registered")

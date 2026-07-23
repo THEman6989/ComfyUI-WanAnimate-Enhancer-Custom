@@ -58,6 +58,26 @@ not activate it. Normal DynamicVRAM model branches keep the original WAN FFN.
 Chunking reduces transient FFN/GELU activation peaks and does not change CLIP
 or VAE execution.
 
+### WAN FFN Chunking
+
+Category: Wan2.2AnimateEnhancer
+
+Standalone branch-local MODEL node for reducing WAN FFN/GELU peak VRAM. Unlike
+the Model Enhancer's compatibility option, this node works with both ordinary
+DynamicVRAM/standard WAN models and DisTorch WAN models.
+
+Selectable presets:
+- `disabled`
+- `512`, `1024`, `2048`, `4096`, `8192`, `16384`, `32768` tokens
+
+Smaller values reduce peak VRAM more strongly but run more FFN calls and are
+therefore slower. Start with `4096`; use `2048` or `1024` for long/high-resolution
+clips that still OOM.
+
+```text
+[WAN Model + LoRAs] -> [WAN FFN Chunking] -> [SageAttention] -> [KSampler]
+```
+
 ## Usage
 
 ### Basic Usage (Data Layer Only)

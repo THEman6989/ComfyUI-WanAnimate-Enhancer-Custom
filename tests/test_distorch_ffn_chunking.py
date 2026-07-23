@@ -11,8 +11,14 @@ MODULE_PATH = Path(__file__).resolve().parents[1] / "wan_animate_to_video_enhanc
 
 
 class FakeModelPatcher:
-    def __init__(self):
+    def __init__(self, model=None):
         self.object_patches = {}
+        self.model = model
+
+    def clone(self):
+        clone = FakeModelPatcher(self.model)
+        clone.object_patches = dict(self.object_patches)
+        return clone
 
     def add_object_patch(self, path, value):
         self.object_patches[path] = value
@@ -181,6 +187,49 @@ def test_real_model_patcher_applies_and_restores_object_patch():
     assert root.diffusion_model.blocks[0].ffn.forward.__func__ is original_function
 
 
+def test_standalone_chunking_node_exposes_selectable_presets():
+    module = load_module()
+    inputs = module.WanAnimateFFNChunking.INPUT_TYPES()["required"]
+
+    assert inputs["chunk_tokens"][0] == [
+        "disabled",
+        "512",
+        "1024",
+        "2048",
+        "4096",
+        "8192",
+        "16384",
+        "32768",
+    ]
+    assert module.WanAnimateFFNChunking.RETURN_TYPES == ("MODEL",)
+
+
+def test_standalone_chunking_node_patches_normal_dynamic_branch():
+    module = load_module()
+    wan, ffn = make_model()
+    root = SimpleNamespace(diffusion_model=wan)
+    original = FakeModelPatcher(root)
+
+    (chunked,) = module.WanAnimateFFNChunking().apply(original, "2048")
+
+    assert chunked is not original
+    assert original.object_patches == {}
+    assert "diffusion_model.blocks.0.ffn.forward" in chunked.object_patches
+    assert chunked._wan_ffn_chunk_tokens == 2048
+
+
+def test_standalone_chunking_node_disabled_is_branch_local_passthrough():
+    module = load_module()
+    wan, _ = make_model()
+    original = FakeModelPatcher(SimpleNamespace(diffusion_model=wan))
+
+    (disabled,) = module.WanAnimateFFNChunking().apply(original, "disabled")
+
+    assert disabled is not original
+    assert disabled.object_patches == {}
+    assert disabled._wan_ffn_chunk_tokens == 0
+
+
 def main():
     tests = [
         test_metadata_detection_walks_model_layers_and_handles_cycles,
@@ -190,6 +239,9 @@ def main():
         test_reconfiguration_creates_independent_branch_patches,
         test_autocast_output_dtype_matches_original_ffn,
         test_real_model_patcher_applies_and_restores_object_patch,
+        test_standalone_chunking_node_exposes_selectable_presets,
+        test_standalone_chunking_node_patches_normal_dynamic_branch,
+        test_standalone_chunking_node_disabled_is_branch_local_passthrough,
     ]
     for test in tests:
         test()

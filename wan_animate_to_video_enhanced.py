@@ -78,6 +78,82 @@ def configure_distorch_ffn_chunking(model_patcher, model_obj, distorch_enabled, 
     return True
 
 
+FFN_CHUNK_PRESETS = [
+    "disabled",
+    "512",
+    "1024",
+    "2048",
+    "4096",
+    "8192",
+    "16384",
+    "32768",
+]
+
+
+def resolve_wan_model(model_patcher):
+    """Resolve the WAN diffusion model and its ModelPatcher object-patch prefix."""
+    model_obj = model_patcher.model
+    model_path_prefix = ""
+    if hasattr(model_obj, "diffusion_model"):
+        model_obj = model_obj.diffusion_model
+        model_path_prefix = "diffusion_model."
+    return model_obj, model_path_prefix
+
+
+class WanAnimateFFNChunking:
+    """Branch-local WAN FFN chunking for normal DynamicVRAM and DisTorch models."""
+
+    @classmethod
+    def INPUT_TYPES(cls) -> Dict[str, Any]:
+        return {
+            "required": {
+                "model": ("MODEL",),
+                "chunk_tokens": (
+                    FFN_CHUNK_PRESETS,
+                    {
+                        "default": "4096",
+                        "tooltip": (
+                            "Smaller chunks reduce peak FFN VRAM but are slower. "
+                            "Recommended: 4096; use 2048 or 1024 for very long/high-resolution WAN clips."
+                        ),
+                    },
+                ),
+            }
+        }
+
+    RETURN_TYPES = ("MODEL",)
+    RETURN_NAMES = ("model",)
+    FUNCTION = "apply"
+    CATEGORY = "Wan2.2AnimateEnhancer"
+
+    def apply(self, model, chunk_tokens="4096") -> Tuple:
+        model_clone = model.clone()
+        selected_tokens = 0 if chunk_tokens == "disabled" else int(chunk_tokens)
+        model_clone._wan_ffn_chunk_tokens = selected_tokens
+
+        if selected_tokens == 0:
+            print("[WanAnimateFFNChunking] Disabled for this MODEL branch")
+            return (model_clone,)
+
+        model_obj, model_path_prefix = resolve_wan_model(model_clone)
+        configured = configure_distorch_ffn_chunking(
+            model_clone,
+            model_obj,
+            True,
+            selected_tokens,
+            model_path_prefix,
+        )
+        if not configured:
+            raise RuntimeError("WAN FFN blocks were not found on the supplied MODEL")
+
+        model_kind = "DisTorch" if has_distorch_metadata(model_clone) else "DynamicVRAM/standard"
+        print(
+            f"[WanAnimateFFNChunking] Enabled {selected_tokens}-token chunks "
+            f"for {model_kind} MODEL branch"
+        )
+        return (model_clone,)
+
+
 class WanAnimateToVideoEnhanced:
     """
     Enhanced WanAnimateToVideo node
