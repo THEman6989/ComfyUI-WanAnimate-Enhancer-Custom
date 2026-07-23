@@ -12,6 +12,72 @@ import comfy.utils
 from typing import Tuple, Dict, Any
 
 
+def has_distorch_metadata(root):
+    """Detect DisTorch markers through common ModelPatcher wrapper layers."""
+    pending = [root]
+    visited = set()
+    while pending:
+        current = pending.pop()
+        if current is None or id(current) in visited:
+            continue
+        visited.add(id(current))
+        if hasattr(current, '_distorch_v2_meta') or hasattr(current, '_distorch_block_assignments'):
+            return True
+        for attr in ('model', 'patcher', 'diffusion_model'):
+            child = getattr(current, attr, None)
+            if child is not None and id(child) not in visited:
+                pending.append(child)
+    return False
+
+
+def configure_distorch_ffn_chunking(model_patcher, model_obj, distorch_enabled, ffn_chunk_tokens, model_path_prefix=""):
+    """Register branch-local WAN FFN forward patches on a ModelPatcher clone."""
+    ffn_chunk_tokens = max(0, int(ffn_chunk_tokens))
+    should_chunk_ffn = distorch_enabled and ffn_chunk_tokens > 0
+    if not should_chunk_ffn or not hasattr(model_obj, 'blocks'):
+        return False
+
+    def make_chunked_forward(original_forward, chunk_tokens):
+        log_emitted = False
+
+        def chunked_ffn_forward(self, input_tensor):
+            nonlocal log_emitted
+            if input_tensor.ndim < 3 or input_tensor.shape[1] <= chunk_tokens:
+                return original_forward(input_tensor)
+
+            token_count = input_tensor.shape[1]
+            first_end = min(chunk_tokens, token_count)
+            first_chunk = original_forward(input_tensor[:, :first_end, :])
+            output_shape = list(input_tensor.shape)
+            output_shape[-1] = first_chunk.shape[-1]
+            output = torch.empty(
+                output_shape, dtype=first_chunk.dtype, device=first_chunk.device
+            )
+            output[:, :first_end, :] = first_chunk
+            if not log_emitted:
+                print(
+                    f"[WanAnimateModelEnhancer] FFN chunking active: "
+                    f"{token_count} tokens in chunks of {chunk_tokens}"
+                )
+                log_emitted = True
+            for start in range(first_end, token_count, chunk_tokens):
+                end = min(start + chunk_tokens, token_count)
+                output[:, start:end, :] = original_forward(input_tensor[:, start:end, :])
+            return output
+
+        return chunked_ffn_forward
+
+    for block_index, block in enumerate(model_obj.blocks):
+        ffn = getattr(block, 'ffn', None)
+        if ffn is None:
+            continue
+        chunked_forward = make_chunked_forward(ffn.forward, ffn_chunk_tokens)
+        patch_path = f"{model_path_prefix}blocks.{block_index}.ffn.forward"
+        model_patcher.add_object_patch(patch_path, types.MethodType(chunked_forward, ffn))
+
+    return True
+
+
 class WanAnimateToVideoEnhanced:
     """
     Enhanced WanAnimateToVideo node
@@ -234,7 +300,16 @@ class WanAnimateModelEnhancer:
             "required": {
                 "model": ("MODEL",),
                 "enable": ("BOOLEAN", {"default": True}),
-            }
+            },
+            "optional": {
+                "ffn_chunk_tokens": ("INT", {
+                    "default": 4096,
+                    "min": 0,
+                    "max": 65536,
+                    "step": 1024,
+                    "tooltip": "Process WAN FFN tokens in chunks only when DisTorch is detected. 0 disables chunking."
+                }),
+            },
         }
 
     RETURN_TYPES = ("MODEL",)
@@ -242,15 +317,29 @@ class WanAnimateModelEnhancer:
     FUNCTION = "enhance"
     CATEGORY = "Wan2.2AnimateEnhancer"
 
-    def enhance(self, model, enable=True) -> Tuple:
+    def enhance(self, model, enable=True, ffn_chunk_tokens=4096) -> Tuple:
         if not enable:
             return (model,)
         
         model_clone = model.clone()
+
+        distorch_enabled = has_distorch_metadata(model_clone)
         model_obj = model_clone.model
+        model_path_prefix = ""
         
         if hasattr(model_obj, 'diffusion_model'):
             model_obj = model_obj.diffusion_model
+            model_path_prefix = "diffusion_model."
+
+        ffn_chunk_tokens = max(0, int(ffn_chunk_tokens))
+        should_chunk_ffn = configure_distorch_ffn_chunking(
+            model_clone, model_obj, distorch_enabled, ffn_chunk_tokens, model_path_prefix
+        )
+        if should_chunk_ffn:
+            print(f"[WanAnimateModelEnhancer] Configured DisTorch FFN chunk size: {ffn_chunk_tokens} tokens")
+            model_clone._wan_ffn_chunk_tokens = ffn_chunk_tokens
+        elif ffn_chunk_tokens > 0:
+            print("[WanAnimateModelEnhancer] DisTorch not detected; FFN chunking disabled")
             
         if not hasattr(model_obj, 'face_adapter'):
             print("[WanAnimateModelEnhancer] Warning: Model missing face_adapter, skipping")

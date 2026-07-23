@@ -2,7 +2,7 @@
 
 Enhanced WanAnimateToVideo with multi-dimensional control
 
-Version: 1.0.0
+Version: 1.1.0
 
 ## Features
 
@@ -16,7 +16,7 @@ Version: 1.0.0
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone YOUR_REPO_URL ComfyUI-Wan-Animate-Enhancer
+git clone https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer.git ComfyUI-Wan-Animate-Enhancer
 # Restart ComfyUI
 ```
 
@@ -50,6 +50,13 @@ Model patcher for motion strength control. Place between model loader and ToVide
 
 Parameters:
 - enable: Enable/disable enhancement
+- ffn_chunk_tokens: Token chunk size for the WAN transformer FFN (default `4096`; `0` disables it)
+
+FFN chunking is activated only when the connected **MODEL itself** carries
+DisTorch metadata. DisTorch CLIP or VAE loaders elsewhere in the workflow do
+not activate it. Normal DynamicVRAM model branches keep the original WAN FFN.
+Chunking reduces transient FFN/GELU activation peaks and does not change CLIP
+or VAE execution.
 
 ## Usage
 
@@ -152,6 +159,12 @@ Should see __init__.py and wan_animate_tovideo_enhanced.py
 - ComfyUI (latest version)
 - Wan2.2-Animate-14B model
 - PyTorch 2.0+
+
+## Fork note
+
+This fork preserves the original MIT-licensed implementation and attribution
+from [`wallen0322/ComfyUI-WanAnimate-Enhancer`](https://github.com/wallen0322/ComfyUI-WanAnimate-Enhancer).
+It adds DisTorch-aware WAN FFN activation chunking and regression tests.
 
 ## License
 

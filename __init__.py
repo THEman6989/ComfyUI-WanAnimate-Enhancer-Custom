@@ -3,12 +3,22 @@ Wan Animate Enhancer Package
 Enhanced WanAnimateToVideo with multi-dimensional control
 """
 
-from .wan_animate_to_video_enhanced import (
-    WanAnimateToVideoEnhanced,
-    WanAnimateModelEnhancer,
-)
+try:
+    from .wan_animate_to_video_enhanced import (
+        WanAnimateToVideoEnhanced,
+        WanAnimateModelEnhancer,
+    )
+except ImportError:
+    # Pytest imports a repository-root __init__.py without package context.
+    # ComfyUI's normal package import always uses the relative branch above.
+    if __package__:
+        raise
+    from wan_animate_to_video_enhanced import (
+        WanAnimateToVideoEnhanced,
+        WanAnimateModelEnhancer,
+    )
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 NODE_CLASS_MAPPINGS = {
     "WanAnimateToVideoEnhanced": WanAnimateToVideoEnhanced,
@@ -22,12 +32,12 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
 NODE_METADATA = {
     "WanAnimateToVideoEnhanced": {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "category": "Wan2.2AnimateEnhancer",
         "description": "Enhanced WanAnimateToVideo with motion/expression/pose/background control",
     },
     "WanAnimateModelEnhancer": {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "category": "Wan2.2AnimateEnhancer",
         "description": "Model enhancer for motion strength control",
     },
