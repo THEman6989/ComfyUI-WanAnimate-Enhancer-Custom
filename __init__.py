@@ -26,8 +26,8 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WanAnimateToVideoEnhanced": "Wan Animate To Video Enhanced",
-    "WanAnimateModelEnhancer": "Wan Animate Model Enhancer",
+    "WanAnimateToVideoEnhanced": "Wan Animate To Video Enhanced (Custom)",
+    "WanAnimateModelEnhancer": "Wan Animate Model Enhancer (Custom)",
 }
 
 NODE_METADATA = {
@@ -45,4 +45,4 @@ NODE_METADATA = {
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'NODE_METADATA']
 
-print(f"Wan Animate Enhancer v{__version__} loaded - 2 nodes registered")
+print(f"Wan Animate Enhancer Custom v{__version__} loaded - 2 nodes registered")
