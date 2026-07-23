@@ -1,4 +1,4 @@
-# ComfyUI-WanAnimate-Enhancer
+# ComfyUI-WanAnimate-Enhancer-Custom
 
 Enhanced WanAnimateToVideo with multi-dimensional control
 
@@ -16,7 +16,7 @@ Version: 1.1.0
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer.git ComfyUI-Wan-Animate-Enhancer
+git clone https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer-Custom.git ComfyUI-WanAnimate-Enhancer-Custom
 # Restart ComfyUI
 ```
 

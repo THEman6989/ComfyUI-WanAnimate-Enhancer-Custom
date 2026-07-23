@@ -1,8 +1,8 @@
 {
-  "name": "ComfyUI-WanAnimate-Enhancer",
+  "name": "ComfyUI-WanAnimate-Enhancer-Custom",
   "version": "1.1.0",
   "description": "Enhanced WanAnimateToVideo nodes packaged for direct use under ComfyUI/custom_nodes. Original code preserved.",
-  "author": "",
+  "author": "THEman6989",
   "tags": [
     "wan",
     "animate",
@@ -10,7 +10,7 @@
     "enhancer",
     "comfyui"
   ],
-  "license": "",
-  "website": "",
-  "repo": ""
+  "license": "MIT",
+  "website": "https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer-Custom",
+  "repo": "https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer-Custom"
 }

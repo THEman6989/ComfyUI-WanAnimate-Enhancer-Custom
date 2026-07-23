@@ -1,5 +1,5 @@
 """
-Wan Animate Enhancer Package
+Wan Animate Enhancer Custom Package
 Enhanced WanAnimateToVideo with multi-dimensional control
 """
 

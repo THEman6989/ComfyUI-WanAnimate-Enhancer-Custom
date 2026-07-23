@@ -1,4 +1,4 @@
-# 适用于 ComfyUI 的 Wan Animate 增强器
+# 适用于 ComfyUI 的 Wan Animate 增强器 Custom
 
 为 WanAnimateToVideo 提供多维度可控增强
 

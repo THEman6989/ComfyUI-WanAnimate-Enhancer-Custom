@@ -1,5 +1,5 @@
 [project]
-name = "wananimate-enhancer"
+name = "wananimate-enhancer-custom"
 description = "Enhanced WanAnimateToVideo with multi-dimensional control"
 version = "1.1.0"
 license = {file = "LICENSE"} 
@@ -23,13 +23,13 @@ license = {file = "LICENSE"}
 dependencies = []
 
 [project.urls]
-Repository = "https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer"
+Repository = "https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer-Custom"
 Documentation = "https://github.com/wallen0322/ComfyUI-WanAnimate-Enhancer/wiki"
-"Bug Tracker" = "https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer/issues"
+"Bug Tracker" = "https://github.com/THEman6989/ComfyUI-WanAnimate-Enhancer-Custom/issues"
 
 [tool.comfy]
 PublisherID = "THEman6989"
-DisplayName = "ComfyUI-WanAnimate-Enhancer"
+DisplayName = "ComfyUI-WanAnimate-Enhancer-Custom"
 Icon = ""
 includes = [] 
 # "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility
