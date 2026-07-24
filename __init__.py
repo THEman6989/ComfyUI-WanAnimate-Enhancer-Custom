@@ -20,7 +20,7 @@ except ImportError:
         WanAnimateFFNChunking,
     )
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 NODE_CLASS_MAPPINGS = {
     "WanAnimateToVideoEnhanced": WanAnimateToVideoEnhanced,
@@ -36,17 +36,17 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
 NODE_METADATA = {
     "WanAnimateToVideoEnhanced": {
-        "version": "1.2.0",
+        "version": "1.2.1",
         "category": "Wan2.2AnimateEnhancer",
         "description": "Enhanced WanAnimateToVideo with motion/expression/pose/background control",
     },
     "WanAnimateModelEnhancer": {
-        "version": "1.2.0",
+        "version": "1.2.1",
         "category": "Wan2.2AnimateEnhancer",
         "description": "Model enhancer for motion strength control",
     },
     "WanAnimateFFNChunking": {
-        "version": "1.2.0",
+        "version": "1.2.1",
         "category": "Wan2.2AnimateEnhancer",
         "description": "Branch-local selectable WAN FFN chunking for lower peak VRAM",
     },

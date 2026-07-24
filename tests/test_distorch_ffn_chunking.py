@@ -200,6 +200,8 @@ def test_standalone_chunking_node_exposes_selectable_presets():
         "8192",
         "16384",
         "32768",
+        "65536",
+        "128000",
     ]
     assert module.WanAnimateFFNChunking.RETURN_TYPES == ("MODEL",)
 

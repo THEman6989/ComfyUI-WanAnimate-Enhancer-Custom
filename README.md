@@ -2,7 +2,7 @@
 
 Enhanced WanAnimateToVideo with multi-dimensional control
 
-Version: 1.2.0
+Version: 1.2.1
 
 ## Features
 
@@ -68,7 +68,7 @@ DynamicVRAM/standard WAN models and DisTorch WAN models.
 
 Selectable presets:
 - `disabled`
-- `512`, `1024`, `2048`, `4096`, `8192`, `16384`, `32768` tokens
+- `512`, `1024`, `2048`, `4096`, `8192`, `16384`, `32768`, `65536`, `128000` tokens
 
 Smaller values reduce peak VRAM more strongly but run more FFN calls and are
 therefore slower. Start with `4096`; use `2048` or `1024` for long/high-resolution
